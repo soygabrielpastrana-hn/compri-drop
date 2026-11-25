@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { onAuthStateChanged, signInWithPopup, signOut } from 'firebase/auth';
+import { onAuthStateChanged, signInWithPopup, signInWithRedirect, signOut } from 'firebase/auth';
 import { auth, googleProvider } from '../firebase.js';
 import { api, setTokenGetter } from '../lib/api.js';
 
@@ -7,6 +7,7 @@ const AuthCtx = createContext(null);
 const CACHE_KEY = 'yolq-user';
 
 // Copia ligera del usuario para pintar la interfaz al instante. La seguridad real es el token de Firebase.
+
 const readCache = () => {
   try {
     return JSON.parse(localStorage.getItem(CACHE_KEY));
@@ -69,12 +70,15 @@ export function AuthProvider({ children }) {
   }, [profile]);
 
   const login = useCallback(async () => {
-    try {
-      await signInWithPopup(auth, googleProvider);
-    } catch (err) {
-      if (err.code !== 'auth/popup-closed-by-user' && err.code !== 'auth/cancelled-popup-request') console.error(err);
+  try {
+    await signInWithPopup(auth, googleProvider);
+  } catch (err) {
+    if (['auth/popup-blocked', 'auth/operation-not-supported-in-this-environment'].includes(err.code)) {
+      return signInWithRedirect(auth, googleProvider); // el navegador bloqueó el popup
     }
-  }, []);
+    if (err.code !== 'auth/popup-closed-by-user' && err.code !== 'auth/cancelled-popup-request') console.error(err);
+  }
+}, []);
 
   const logout = useCallback(() => signOut(auth), []);
 

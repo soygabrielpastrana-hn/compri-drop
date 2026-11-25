@@ -6,7 +6,8 @@ import { useSite } from '../context/SiteContext.jsx';
 
 // Enlace opcional: interno (/?cat=Hogar), externo (https://…) o sin enlace
 function Wrap({ link, className, children }) {
-  if (!link) return <div className={className}>{children}</div>;
+  const safe = /^(\/(?!\/)|https?:\/\/)/i.test(link || '');
+  if (!link || !safe) return <div className={className}>{children}</div>;
   return link.startsWith('/') ? (
     <Link to={link} className={className}>{children}</Link>
   ) : (
@@ -57,10 +58,10 @@ export default function HeroBanners() {
   const go = (d) => setI((x) => (x + d + n) % n);
 
   return (
-    <div className={`grid gap-4 ${side.length ? 'lg:grid-cols-[1fr_300px]' : ''}`}>
+    <div className={`mb-6 grid w-full min-w-0 max-w-full grid-cols-1 gap-3 sm:gap-4 lg:mb-10 lg:gap-6 [&>*]:min-w-0 ${side.length ? 'lg:grid-cols-[minmax(0,1fr)_300px]' : ''}`}>
       {/* Banner principal */}
       <div
-        className="group/hero relative aspect-[3/1] min-h-32 overflow-hidden rounded-2xl bg-slate-200 shadow-sm ring-1 ring-slate-200"
+        className="group/hero relative aspect-[3/1] w-full max-w-full overflow-hidden rounded-2xl bg-slate-200 shadow-sm ring-1 ring-slate-200"
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
       >

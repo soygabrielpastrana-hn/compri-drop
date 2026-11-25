@@ -6,8 +6,8 @@ import { money } from '../../lib/format.js';
 import { useSite } from '../../context/SiteContext.jsx';
 import Spinner, { Notice } from '../../components/Spinner.jsx';
 
-const BLUE = '#1d4ed8';
-const YELLOW = '#eab308';
+const BLUE = '#1B4DDB';
+const YELLOW = '#FFC21A';
 const TZ = 'America/Tegucigalpa';
 const DAY = 86_400_000;
 const RANGES = [['7', 'Últimos 7 días'], ['30', 'Últimos 30 días'], ['month', 'Por mes']];
@@ -125,7 +125,7 @@ const Tip = ({ active, payload }) =>
     </div>
   ) : null;
 
-export default function DashboardTab({ guard, go }) {
+export default function DashboardTab({ guard, go, can = () => true }) {
   const site = useSite();
   const [range, setRange] = useState('7');
   const [showSales, setShowSales] = useState(true);
@@ -220,7 +220,11 @@ export default function DashboardTab({ guard, go }) {
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <Kpi icon={CircleDollarSign} tone="yellow" label="Ventas totales" value={money(salesTotal)} sub={`${money(salesDelivered)} ya entregadas`} />
         <Kpi icon={MessageCircle} tone="blue" label="Pedidos pendientes de WhatsApp" value={pending} sub={pending > 0 ? 'Por confirmar con el cliente' : 'Todo al día'} />
-        <Kpi icon={Building2} tone="blue" label="Proveedores activos" value={catalog.suppliers.length} sub="Con productos activos" />
+        {can('suppliers:read') ? (
+          <Kpi icon={Building2} tone="blue" label="Proveedores activos" value={catalog.suppliers.length} sub="Con productos activos" />
+        ) : (
+          <Kpi icon={Building2} tone="blue" label="Productos activos" value={(products || []).filter((p) => p.active).length} sub="Visibles en la tienda" />
+        )}
         <Kpi icon={Boxes} tone="yellow" label="Productos en stock" value={catalog.inStock} sub={`${catalog.units} unidades disponibles`} />
       </div>
 
@@ -366,7 +370,7 @@ export default function DashboardTab({ guard, go }) {
         )}
       </section>
 
-      {/* Proveedores */}
+      {can('suppliers:read') && (
       <section>
         <div className="mb-3 flex items-center justify-between">
           <h3 className="text-base font-bold text-slate-900">Proveedores activos</h3>
@@ -390,6 +394,8 @@ export default function DashboardTab({ guard, go }) {
           </div>
         )}
       </section>
+
+      )}
 
       {data.capped && <p className="text-center text-xs text-slate-400">Se analizaron los 1000 pedidos más recientes.</p>}
     </div>

@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { api } from '../lib/api.js';
 
 const DEFAULT = {
-  siteName: 'Yo lo Quiero HN', logoUrl: '', whatsapp: import.meta.env.VITE_STORE_WHATSAPP || '',
+  siteName: 'Compri', logoUrl: '', whatsapp: import.meta.env.VITE_STORE_WHATSAPP || '',
   sideBanners: [], freeShippingMin: 0, cashbackPercent: 5, guestCashbackDays: 45, bankAccounts: [],
 };
 

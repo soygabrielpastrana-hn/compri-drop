@@ -6,7 +6,7 @@ import { money } from '../../lib/format.js';
 import Spinner, { Notice } from '../../components/Spinner.jsx';
 import ProductForm from './ProductForm.jsx';
 
-export default function ProductsTab({ guard }) {
+export default function ProductsTab({ guard, canWrite = true }) {
   const [list, setList] = useState(null);
   const [editing, setEditing] = useState(null); // null = lista | {} = nuevo | producto = editar
   const [q, setQ] = useState('');
@@ -59,9 +59,11 @@ export default function ProductsTab({ guard }) {
             placeholder="Buscar…"
             className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm"
           />
+          {canWrite && (
           <button onClick={() => setEditing({})} className="flex items-center gap-1.5 rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white">
             <Plus size={16} /> Nuevo producto
           </button>
+          )}
         </div>
       </div>
 
@@ -107,13 +109,15 @@ export default function ProductsTab({ guard }) {
                   <td className={`p-3 ${p.totalStock === 0 ? 'font-semibold text-red-600' : ''}`}>{p.totalStock}</td>
                   <td className="p-3">
                     <button
-                      onClick={() => toggle(p)}
+                      onClick={() => canWrite && toggle(p)}
+                      disabled={!canWrite}
                       className={`rounded-full px-3 py-1 text-xs font-semibold ${p.active ? 'bg-green-100 text-green-700' : 'bg-slate-200 text-slate-500'}`}
                     >
                       {p.active ? 'Activo' : 'Oculto'}
                     </button>
                   </td>
                   <td className="p-3">
+                    {canWrite && (
                     <div className="flex justify-end gap-3">
                       <button onClick={() => setEditing(p)} aria-label="Editar" className="text-slate-500 hover:text-brand-600">
                         <Pencil size={16} />
@@ -122,6 +126,7 @@ export default function ProductsTab({ guard }) {
                         <Trash2 size={16} />
                       </button>
                     </div>
+                    )}
                   </td>
                 </tr>
               ))}

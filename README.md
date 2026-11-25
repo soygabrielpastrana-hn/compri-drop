@@ -1,4 +1,4 @@
-# Yo lo Quiero HN (monorepo)
+# Tienda HN (monorepo)
 - /server  API Node + Express + Mongoose  (Fase 1)
 - /client  React + Vite + Tailwind        (Fase 2)
 - /client/src/pages/admin  Panel /admin   (Fase 3)

@@ -1,7 +1,9 @@
 import { Router } from 'express';
 import mongoose from 'mongoose';
 import Product from '../models/Product.js';
-import { requireAdmin } from '../middleware/auth.js';
+import { requirePerm } from '../middleware/auth.js';
+import { can } from '../utils/rbac.js';
+import { safeLink } from '../utils/validate.js';
 import { httpError } from '../utils/httpError.js';
 
 const router = Router();
@@ -10,7 +12,14 @@ const EDITABLE = [
   'name', 'slug', 'description', 'category', 'subcategory', 'brand', 'images', 'price', 'comparePrice',
   'hasVariants', 'stock', 'variants', 'supplier', 'payment', 'shipping', 'active', 'featured',
 ];
-const pick = (obj, keys) => Object.fromEntries(keys.filter((k) => obj?.[k] !== undefined).map((k) => [k, obj[k]]));
+const pick = (obj, keys) => {
+  const d = Object.fromEntries(keys.filter((k) => obj?.[k] !== undefined).map((k) => [k, obj[k]]));
+  // Entrada segura: solo URLs https o /api/media en imágenes (bloquea javascript: y data:), descripción acotada
+  if (Array.isArray(d.images)) d.images = d.images.slice(0, 12).map((u) => safeLink(u, 'La URL de imagen')).filter(Boolean);
+  if (Array.isArray(d.variants)) d.variants = d.variants.map((v) => ({ ...v, image: safeLink(v?.image, 'La imagen de la variante') }));
+  if (d.description !== undefined) d.description = String(d.description).slice(0, 5000);
+  return d;
+};
 
 const SORTS = {
   recientes: { createdAt: -1 },
@@ -54,17 +63,19 @@ router.get('/categories', async (_req, res) => {
 });
 
 // ---------- Admin ----------
-router.get('/admin/list', requireAdmin, async (req, res) => {
+router.get('/admin/list', requirePerm('products:read'), async (req, res) => {
   const filter = req.query.q ? { $text: { $search: String(req.query.q) } } : {};
-  res.json(await Product.find(filter).sort({ createdAt: -1 }).limit(500));
+  const query = Product.find(filter).sort({ createdAt: -1 }).limit(500);
+  if (!can(req.staff.role, 'suppliers:read')) query.select('-supplier'); // el Vendedor no ve costos ni proveedores
+  res.json(await query);
 });
 
-router.post('/', requireAdmin, async (req, res) => {
+router.post('/', requirePerm('products:write'), async (req, res) => {
   const product = await Product.create(pick(req.body, EDITABLE));
   res.status(201).json(product);
 });
 
-router.put('/:id', requireAdmin, async (req, res) => {
+router.put('/:id', requirePerm('products:write'), async (req, res) => {
   const product = await Product.findById(req.params.id);
   if (!product) throw httpError(404, 'Producto no encontrado');
   product.set(pick(req.body, EDITABLE)); // para variantes existentes envía su _id y se conserva
@@ -72,7 +83,7 @@ router.put('/:id', requireAdmin, async (req, res) => {
   res.json(product);
 });
 
-router.delete('/:id', requireAdmin, async (req, res) => {
+router.delete('/:id', requirePerm('products:write'), async (req, res) => {
   const deleted = await Product.findByIdAndDelete(req.params.id);
   if (!deleted) throw httpError(404, 'Producto no encontrado');
   res.json({ ok: true });

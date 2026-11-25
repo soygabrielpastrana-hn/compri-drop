@@ -23,7 +23,7 @@ router.get('/:slug', async (req, res) => {
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(desc)}">
 <meta property="og:type" content="product">
-<meta property="og:site_name" content="Yo lo Quiero HN">
+<meta property="og:site_name" content="Compri">
 <meta property="og:title" content="${esc(title)}">
 <meta property="og:description" content="${esc(desc)}">
 <meta property="og:url" content="${esc(target)}">

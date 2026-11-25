@@ -15,11 +15,11 @@ function ShareCard({ cardRef, product, image, price }) {
       ref={cardRef}
       style={{
         width: 320, height: 568, color: '#ffffff', fontFamily: 'system-ui, sans-serif',
-        background: 'linear-gradient(160deg,#1e3a8a 0%,#2563eb 100%)',
+        background: 'linear-gradient(160deg,#0F2A7A 0%,#1B4DDB 100%)',
       }}
       className="flex flex-col items-center gap-3 p-5 text-center"
     >
-      <div style={{ fontSize: 13, letterSpacing: 3, fontWeight: 800 }}>Yo lo Quiero HN</div>
+      <div style={{ fontSize: 13, letterSpacing: 3, fontWeight: 800 }}>COMPRI</div>
       <div style={{ width: 280, height: 280, background: '#ffffff', borderRadius: 20, overflow: 'hidden' }}>
         {image && (
           <img src={image} alt="" crossOrigin="anonymous" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -27,7 +27,7 @@ function ShareCard({ cardRef, product, image, price }) {
       </div>
       <div className="flex flex-wrap justify-center gap-1.5">
         {badges.map((b) => (
-          <span key={b} style={{ background: '#ffffff', color: '#1e3a8a', fontSize: 11, fontWeight: 800, padding: '4px 10px', borderRadius: 999 }}>
+          <span key={b} style={{ background: '#ffffff', color: '#0F2A7A', fontSize: 11, fontWeight: 800, padding: '4px 10px', borderRadius: 999 }}>
             {b}
           </span>
         ))}

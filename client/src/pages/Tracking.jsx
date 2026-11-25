@@ -54,7 +54,7 @@ export default function Tracking() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    document.title = `Pedido #${code} | Yo lo Quiero HN`;
+    document.title = `Pedido #${code} | Compri HN`;
     api.track(code, token).then(setOrder).catch((e) => setError(e.message));
   }, [code, token]);
 

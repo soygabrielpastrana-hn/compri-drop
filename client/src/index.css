@@ -1,26 +1,36 @@
 @import "tailwindcss";
 
 /*
-  PALETA DE MARCA — cambia estos valores y se recolorea toda la tienda y el admin.
-  brand  = azul corporativo   |   accent = amarillo de acento
+  IDENTIDAD VISUAL COMPRI (única fuente de colores de la tienda y del admin)
+    Azul principal  #1B4DDB  → brand-600
+    Azul marino     #0F2A7A  → brand-800
+    Amarillo        #FFC21A  → accent-400
+  El resto son tonos claros/oscuros de esos mismos colores.
 */
 @theme {
-  --color-brand-50: #eff6ff;
-  --color-brand-100: #dbeafe;
-  --color-brand-200: #bfdbfe;
-  --color-brand-500: #2563eb;
-  --color-brand-600: #1d4ed8;
-  --color-brand-700: #1e40af;
-  --color-brand-800: #1e3a8a;
-  --color-brand-900: #172554;
+  --color-brand-50: #eef3ff;
+  --color-brand-100: #dce6fd;
+  --color-brand-200: #b9cdfb;
+  --color-brand-500: #3c6be8;
+  --color-brand-600: #1b4ddb;
+  --color-brand-700: #1640b8;
+  --color-brand-800: #0f2a7a;
+  --color-brand-900: #0a1d57;
 
-  --color-accent-50: #fefce8;
-  --color-accent-100: #fef9c3;
-  --color-accent-200: #fef08a;
-  --color-accent-400: #facc15;
-  --color-accent-500: #eab308;
-  --color-accent-700: #a16207;
-  --color-accent-800: #854d0e;
+  --color-accent-50: #fff9e6;
+  --color-accent-100: #fff0bf;
+  --color-accent-200: #ffe699;
+  --color-accent-400: #ffc21a;
+  --color-accent-500: #e6ad0f;
+  --color-accent-700: #9a6f00;
+  --color-accent-800: #7a5700;
+}
+
+/* Nada puede ensanchar la página: evita el desborde horizontal en teléfonos */
+html,
+body {
+  max-width: 100%;
+  overflow-x: clip;
 }
 
 body {

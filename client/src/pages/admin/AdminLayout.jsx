@@ -4,7 +4,7 @@ import { Bell, ExternalLink, LogOut, Menu, Search, X } from 'lucide-react';
 import { useSite } from '../../context/SiteContext.jsx';
 
 // Estructura: sidebar fijo en azul de marca + barra superior (título, búsqueda, notificaciones, perfil) + contenido en gris claro
-export default function AdminLayout({ nav, tab, title, pending, adminName, onNavigate, onSearch, onLogout, children }) {
+export default function AdminLayout({ nav, tab, title, pending, adminName, roleLabel, onNavigate, onSearch, onLogout, children }) {
   const site = useSite();
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState('');
@@ -64,7 +64,7 @@ export default function AdminLayout({ nav, tab, title, pending, adminName, onNav
 
         <div className="space-y-2 px-6 py-5 text-xs text-brand-200/80">
           <Link to="/" className="flex items-center gap-1.5 font-medium text-white hover:text-accent-400"><ExternalLink size={14} /> Ver la tienda</Link>
-          <p>{site.siteName} · Panel de administración</p>
+          <p>{site.siteName} · Panel del equipo</p>
         </div>
       </aside>
 
@@ -92,7 +92,7 @@ export default function AdminLayout({ nav, tab, title, pending, adminName, onNav
               </button>
               <div className="hidden text-right sm:block">
                 <p className="text-sm font-semibold leading-tight text-slate-900">{adminName}</p>
-                <p className="text-xs text-slate-400">Administrador</p>
+                <p className="text-xs text-slate-400">{roleLabel}</p>
               </div>
               <span className="grid size-10 place-items-center rounded-full bg-brand-700 text-sm font-bold text-white">{adminName?.[0]?.toUpperCase() || 'A'}</span>
               <button onClick={onLogout} className="text-slate-500 hover:text-red-600" aria-label="Salir" title="Salir"><LogOut size={18} /></button>

@@ -1,7 +1,8 @@
 import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
 import Order, { ORDER_STATUSES } from '../models/Order.js';
-import { authOptional, requireAdmin } from '../middleware/auth.js';
+import { authOptional, requirePerm } from '../middleware/auth.js';
+import { canSetStatus } from '../utils/rbac.js';
 import { createOrder, quoteCart, releaseOrderStock } from '../services/orderService.js';
 import { grantCashback } from '../services/walletService.js';
 import { httpError } from '../utils/httpError.js';
@@ -26,7 +27,11 @@ const TRANSITIONS = {
 };
 
 // Respuesta admin: la orden + link para notificar al cliente por WhatsApp (con /rastreo precargado)
-const withNotify = (o) => ({ ...o.toObject(), notifyUrl: buildNotifyUrl(o), nextStatuses: TRANSITIONS[o.status] });
+// nextStatuses: solo los estados que el rol de quien consulta puede aplicar
+const withNotify = (o, role = 'admin') => ({
+  ...o.toObject(), notifyUrl: buildNotifyUrl(o),
+  nextStatuses: (TRANSITIONS[o.status] || []).filter((s) => canSetStatus(role, s)),
+});
 
 // Cotización del carrito: totales, bloques de pago (split), barra de envío gratis y saldo
 router.post('/quote', authOptional, async (req, res) => {
@@ -49,7 +54,7 @@ router.get('/track/:code', async (req, res) => {
 });
 
 // ---------- Admin ----------
-router.get('/', requireAdmin, async (req, res) => {
+router.get('/', requirePerm('orders:read'), async (req, res) => {
   const { status, q } = req.query;
   const page = Math.max(1, parseInt(req.query.page) || 1);
   const limit = Math.min(100, parseInt(req.query.limit) || 30);
@@ -70,21 +75,22 @@ router.get('/', requireAdmin, async (req, res) => {
     Order.find(filter).sort({ createdAt: -1 }).skip((page - 1) * limit).limit(limit),
     Order.countDocuments(filter),
   ]);
-  res.json({ items: items.map(withNotify), total, page, pages: Math.ceil(total / limit) });
+  res.json({ items: items.map((o) => withNotify(o, req.staff.role)), total, page, pages: Math.ceil(total / limit) });
 });
 
-router.get('/:id', requireAdmin, async (req, res) => {
+router.get('/:id', requirePerm('orders:read'), async (req, res) => {
   const order = await Order.findById(req.params.id);
   if (!order) throw httpError(404, 'Pedido no encontrado');
-  res.json(withNotify(order));
+  res.json(withNotify(order, req.staff.role));
 });
 
 // Cambiar estado (+ nota, transportista y guía opcionales)
-router.patch('/:id/status', requireAdmin, async (req, res) => {
+router.patch('/:id/status', requirePerm('orders:status'), async (req, res) => {
   const order = await Order.findById(req.params.id);
   if (!order) throw httpError(404, 'Pedido no encontrado');
 
   const { status } = req.body;
+  if (!canSetStatus(req.staff.role, status)) throw httpError(403, `Tu rol no puede cambiar un pedido a "${status}"`);
   if (!TRANSITIONS[order.status]?.includes(status))
     throw httpError(400, `No se puede pasar de "${order.status}" a "${status}"`);
 
@@ -99,11 +105,11 @@ router.patch('/:id/status', requireAdmin, async (req, res) => {
   order.status = status;
   order.statusHistory.push(entry);
   await order.save();
-  res.json(withNotify(order));
+  res.json(withNotify(order, req.staff.role));
 });
 
 // Agregar nota / guía sin cambiar el estado (ej. la guía llega después de marcar "Enviado")
-router.patch('/:id/note', requireAdmin, async (req, res) => {
+router.patch('/:id/note', requirePerm('orders:note'), async (req, res) => {
   const order = await Order.findById(req.params.id);
   if (!order) throw httpError(404, 'Pedido no encontrado');
 
@@ -115,7 +121,7 @@ router.patch('/:id/note', requireAdmin, async (req, res) => {
   }
   order.statusHistory.push(entry);
   await order.save();
-  res.json(withNotify(order));
+  res.json(withNotify(order, req.staff.role));
 });
 
 export default router;

@@ -173,7 +173,7 @@ export default function Home() {
   const filtered = ['cat', 'sub', 'q', 'promo', 'sort'].some((k) => params.get(k));
 
   useEffect(() => {
-    document.title = 'Yo lo Quiero HN';
+    document.title = 'Compri | Compras en línea en Honduras';
   }, []);
 
   return (

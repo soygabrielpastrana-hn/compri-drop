@@ -7,7 +7,7 @@ const { Schema } = mongoose;
 const siteConfigSchema = new Schema(
   {
     key: { type: String, default: 'main', unique: true },
-    siteName: { type: String, trim: true, default: 'Yo lo Quiero HN' },
+    siteName: { type: String, trim: true, default: 'Compri' },
     logoUrl: { type: String, trim: true, default: '' },
     whatsapp: { type: String, trim: true, default: '' }, // ventas: 504XXXXXXXX
 

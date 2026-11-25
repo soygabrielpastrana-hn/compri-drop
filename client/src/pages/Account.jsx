@@ -22,7 +22,7 @@ export default function Account() {
   const [msg, setMsg] = useState('');
 
   useEffect(() => {
-    document.title = 'Mi cuenta | Yo lo Quiero HN';
+    document.title = 'Mi cuenta | Compri';
   }, []);
 
   useEffect(() => {

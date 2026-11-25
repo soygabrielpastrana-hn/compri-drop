@@ -30,7 +30,7 @@ export default function ProductPage() {
       .product(slug)
       .then((p) => {
         setProduct(p);
-        document.title = `${p.name} | Yo lo Quiero HN`;
+        document.title = `${p.name} | Compri`;
         trackView(p.category); // alimenta la sección "Para Vos"
         setSelected(p.hasVariants ? normalizeSelection(p.variants, p.attributes, {}) : {});
         setQty(1);

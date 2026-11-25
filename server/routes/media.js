@@ -1,7 +1,7 @@
 import express, { Router } from 'express';
 import mongoose from 'mongoose';
 import Media from '../models/Media.js';
-import { requireAdmin } from '../middleware/auth.js';
+import { requirePerm } from '../middleware/auth.js';
 import { httpError } from '../utils/httpError.js';
 
 const router = Router();
@@ -19,7 +19,7 @@ function sniff(b) {
 // POST /api/media   (cuerpo = la imagen en binario, Content-Type: image/webp | image/jpeg | image/png)
 router.post(
   '/',
-  requireAdmin,
+  requirePerm('media:upload'),
   express.raw({ type: ['image/jpeg', 'image/png', 'image/webp'], limit: '3mb' }),
   async (req, res) => {
     if (!Buffer.isBuffer(req.body) || !req.body.length) throw httpError(400, 'Sube una imagen JPG, PNG o WebP');

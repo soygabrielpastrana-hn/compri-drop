@@ -22,7 +22,7 @@ export default function Rastreo() {
 
   // Enlace de WhatsApp: /rastreo?code=HN-1042&t=TOKEN → carga directa
   useEffect(() => {
-    document.title = 'Rastrear pedido | Yo lo Quiero HN';
+    document.title = 'Rastrear pedido | Compri';
     const c = params.get('code');
     const t = params.get('t');
     if (c && t) {

@@ -69,6 +69,7 @@ export const api = {
   categories: () => request('/categories'),
   banners: () => request('/banners'),
   siteConfig: () => request('/site-config'),
+  popups: () => request('/popups'),
   quote: (body) => request('/orders/quote', { method: 'POST', body }),
   createOrder: (body) => request('/orders', { method: 'POST', body }),
   reviews: (productId) => request(`/reviews/product/${productId}`),
@@ -106,7 +107,15 @@ export const api = {
       if (!res.ok) throw Object.assign(new Error(data.message || 'No se pudo subir la imagen'), { status: res.status });
       return data;
     },
-    login: (password) => request('/admin/login', { method: 'POST', body: { password } }),
+    // Con correo → cuenta del equipo; sin correo → clave maestra
+    login: (email, password) => request('/admin/login', { method: 'POST', body: { email: email || undefined, password } }),
+    me: () => request('/admin/me'),
+    staff: () => request('/admin/staff'),
+    saveStaff: (id, body) => (id ? request(`/admin/staff/${id}`, { method: 'PUT', body }) : request('/admin/staff', { method: 'POST', body })),
+    deleteStaff: (id) => request(`/admin/staff/${id}`, { method: 'DELETE' }),
+    popups: () => request('/popups/admin/all'),
+    savePopup: (id, body) => save('/popups', id, body),
+    deletePopup: (id) => request(`/popups/${id}`, { method: 'DELETE' }),
     stats: (days) => request('/admin/stats', { params: { days } }),
     products: (params) => request('/products/admin/list', { params }),
     saveProduct: (id, body) => save('/products', id, body),

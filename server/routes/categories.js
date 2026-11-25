@@ -1,12 +1,21 @@
 import { Router } from 'express';
 import Category from '../models/Category.js';
 import Product from '../models/Product.js';
-import { requireAdmin } from '../middleware/auth.js';
+import { requirePerm } from '../middleware/auth.js';
+import { bool, int, safeLink, str } from '../utils/validate.js';
 import { httpError } from '../utils/httpError.js';
 
 const router = Router();
-const EDITABLE = ['name', 'icon', 'image', 'parent', 'order', 'active'];
-const pick = (obj) => Object.fromEntries(EDITABLE.filter((k) => obj?.[k] !== undefined).map((k) => [k, obj[k]]));
+const pick = (b = {}) => {
+  const d = {};
+  if (b.name !== undefined) d.name = str(b.name, { field: 'El nombre', min: 1, max: 60 });
+  if (b.icon !== undefined) d.icon = /^https?:/i.test(String(b.icon)) ? safeLink(b.icon, 'El ícono') : str(b.icon, { field: 'El ícono', max: 16 });
+  if (b.image !== undefined) d.image = safeLink(b.image, 'La imagen');
+  if (b.parent !== undefined) d.parent = b.parent || null;
+  if (b.order !== undefined) d.order = int(b.order, { field: 'El orden', min: -1000, max: 1000 });
+  if (b.active !== undefined) d.active = bool(b.active);
+  return d;
+};
 
 // Público: árbol de categorías activas con conteo de productos
 router.get('/', async (_req, res) => {
@@ -30,11 +39,11 @@ router.get('/', async (_req, res) => {
 });
 
 // ---------- Admin ----------
-router.get('/admin/all', requireAdmin, async (_req, res) => {
+router.get('/admin/all', requirePerm('categories:read'), async (_req, res) => {
   res.json(await Category.find().sort({ order: 1, name: 1 }));
 });
 
-router.post('/', requireAdmin, async (req, res) => {
+router.post('/', requirePerm('categories:write'), async (req, res) => {
   const data = pick(req.body);
   if (data.parent) {
     const parent = await Category.findById(data.parent);
@@ -45,7 +54,7 @@ router.post('/', requireAdmin, async (req, res) => {
   res.status(201).json(await Category.create(data));
 });
 
-router.put('/:id', requireAdmin, async (req, res) => {
+router.put('/:id', requirePerm('categories:write'), async (req, res) => {
   const cat = await Category.findById(req.params.id);
   if (!cat) throw httpError(404, 'Categoría no encontrada');
   const data = pick(req.body);
@@ -66,7 +75,7 @@ router.put('/:id', requireAdmin, async (req, res) => {
   res.json(cat);
 });
 
-router.delete('/:id', requireAdmin, async (req, res) => {
+router.delete('/:id', requirePerm('categories:write'), async (req, res) => {
   if (await Category.exists({ parent: req.params.id })) throw httpError(409, 'Elimina primero sus subcategorías');
   const deleted = await Category.findByIdAndDelete(req.params.id);
   if (!deleted) throw httpError(404, 'Categoría no encontrada');

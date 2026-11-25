@@ -3,6 +3,7 @@ import Header from './components/Header.jsx';
 import Footer from './components/Footer.jsx';
 import CartFab from './components/CartFab.jsx';
 import CartDrawer from './components/CartDrawer.jsx';
+import PromoPopup from './components/PromoPopup.jsx';
 import Home from './pages/Home.jsx';
 import ProductPage from './pages/ProductPage.jsx';
 import Checkout from './pages/Checkout.jsx';
@@ -55,6 +56,7 @@ export default function App() {
       <Footer />
       <CartFab />
       <CartDrawer />
+      <PromoPopup />
     </div>
   );
 }

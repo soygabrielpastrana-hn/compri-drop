@@ -56,7 +56,7 @@ export default function Checkout() {
   const { quote, error, couponError, loading } = useQuote(items, { coupon, paymentMethod: form.payment, useWallet });
 
   useEffect(() => {
-    document.title = 'Finalizar pedido | Yo lo Quiero HN';
+    document.title = 'Finalizar pedido | Compri';
   }, []);
 
   useEffect(() => {

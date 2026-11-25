@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import Coupon from '../models/Coupon.js';
-import { requireAdmin } from '../middleware/auth.js';
+import { requirePerm } from '../middleware/auth.js';
 import { httpError } from '../utils/httpError.js';
 
 const router = Router();
@@ -18,11 +18,11 @@ router.post('/validate', async (req, res) => {
 });
 
 // Admin
-router.get('/', requireAdmin, async (_req, res) => res.json(await Coupon.find().sort({ createdAt: -1 })));
+router.get('/', requirePerm('coupons:manage'), async (_req, res) => res.json(await Coupon.find().sort({ createdAt: -1 })));
 
-router.post('/', requireAdmin, async (req, res) => res.status(201).json(await Coupon.create(pick(req.body))));
+router.post('/', requirePerm('coupons:manage'), async (req, res) => res.status(201).json(await Coupon.create(pick(req.body))));
 
-router.put('/:id', requireAdmin, async (req, res) => {
+router.put('/:id', requirePerm('coupons:manage'), async (req, res) => {
   const coupon = await Coupon.findById(req.params.id);
   if (!coupon) throw httpError(404, 'Cupón no encontrado');
   coupon.set(pick(req.body));
@@ -30,7 +30,7 @@ router.put('/:id', requireAdmin, async (req, res) => {
   res.json(coupon);
 });
 
-router.delete('/:id', requireAdmin, async (req, res) => {
+router.delete('/:id', requirePerm('coupons:manage'), async (req, res) => {
   const deleted = await Coupon.findByIdAndDelete(req.params.id);
   if (!deleted) throw httpError(404, 'Cupón no encontrado');
   res.json({ ok: true });
