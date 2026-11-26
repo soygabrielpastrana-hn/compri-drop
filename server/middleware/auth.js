@@ -38,7 +38,7 @@ function verifyStaffToken(token) {
 // Para VERIFICAR el inicio de sesión basta el projectId. La cuenta de servicio es opcional y, si está mal
 // escrita, se ignora con un aviso en consola (nunca se imprime su contenido) en vez de romper el servidor.
 // ---------------------------------------------------------------------------------------------
-const projectId = () => (process.env.FIREBASE_PROJECT_ID || 'yoloquiero-76a81').trim();
+const projectId = () => (process.env.FIREBASE_PROJECT_ID || 'comprihn').trim();
 
 let firebaseMode = null; // null = aún no se inicializó | 'service-account' | 'project-id' | 'disabled'
 
